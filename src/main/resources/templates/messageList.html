@@ -1,3 +1,5 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <html>
 <head>
     <meta charset="UTF-8"/>
@@ -94,12 +96,34 @@
                                 </div>
                             </div>
 
+
+
+
                             <div class="form-group row">
                                 <label for="searchStartDate" class="col-sm-4 col-form-label col-form-label-sm">Megjelenítendő üzenetek száma:</label>
                                 <div class="col-sm-8">
                                     <input type="number" name="limit" class="form-control form-control-sm"/>
                                 </div>
                             </div>
+
+                            <div class="form-group row" data-sec-authorize="hasRole('ADMIN')">
+                            <div class="col-sm-6">
+
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="deleted" id="inlineRadio3" value="all" checked>
+                                    <label class="form-check-label col-form-label-sm" for="inlineRadio1">Összes</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="deleted" id="inlineRadio4" value="visible">
+                                    <label class="form-check-label col-form-label-sm" for="inlineRadio2">Látható</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="deleted" id="inlineRadio5" value="delete">
+                                    <label class="form-check-label col-form-label-sm" for="inlineRadio1">Törölt</label>
+                                </div>
+                            </div>
+                            </div>
+
 
                             <button type="submit" class="btn btn-primary">Keresés</button>
 
@@ -124,6 +148,14 @@
             <td data-th-text="${msg.text}"></td>
             <td data-th-text="${{msg.creationDate}}"></td>
             <td><a data-th-href="@{/message/{id}(id=${msg.id})}">Részletek</a></td>
+
+
+            <td data-sec-authorize="hasRole('ADMIN')">
+                <a data-th-href="@{/delete/{ID}(ID=${msg.id})}" role="button" class="btn btn-outline-danger btn-sm">Delete</a>
+            </td>
+
+
+
         </tr>
     </table>
     </div>

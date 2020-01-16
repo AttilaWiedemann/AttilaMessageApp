@@ -29,13 +29,14 @@ import java.util.stream.Collectors;
 public class MessageController {
 
     private MessageService messageService;
-    private InMemoryUserDetailsManager userService;
+    private InMemoryUserDetailsManager userService; //ennek a helyére lesz a saját
 
     @Autowired
     public MessageController(UserDetailsService userService, MessageService messageService){   //Qualifier
         this.userService = (InMemoryUserDetailsManager) userService;
         this.messageService = messageService;
     }
+
 
     @RequestMapping(value = "/messages", method = RequestMethod.GET)
     public String showMessages(
@@ -47,13 +48,26 @@ public class MessageController {
             @RequestParam(name = "limit", defaultValue = "100", required = false) Integer limit,
             @RequestParam(name = "orderby", defaultValue = "", required = false) String orderBy,
             @RequestParam(name = "order", defaultValue = "asc", required = false) String order,
+            @RequestParam(name = "deleted", required = false) String deleted,
             Model model){
+        List<Message> msgs = messageService.filterMessages(id, author, text, from, to, limit, orderBy, order, deleted);
+        //Messagek filterezése. Adminként a törölt üzenetek is
+        // látszódniak, sima felhasználóként pedig csak a filterezett messagek
+        if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().toString().equals("[ROLE_ADMIN]")){
+            model.addAttribute("msgList", msgs);
+        }else {
+            List<Message> filtmsgs = msgs.stream().filter(message -> !message.isDeleted()).collect(Collectors.toList());
+            model.addAttribute("msgList", filtmsgs);
+        }
 
 
-        List<Message> msgs = messageService.filterMessages(id, author, text, from, to, limit, orderBy, order);
 
-        model.addAttribute("msgList", msgs);
         return "messageList";
+    }
+
+    @GetMapping(value = "/")
+    public String showPage(){
+        return "home";
     }
 
     @GetMapping("/message/{id}")
@@ -81,12 +95,13 @@ public class MessageController {
 
     @PostMapping(path = "/createmessage")
     public String createMessage(@Valid @ModelAttribute("message") Message m, BindingResult bindingResult) {
+        messageService.createMessage(m);
         if (bindingResult.hasErrors()) {
           return "createMessage";
         }
 
 
-        messageService.createMessage(m);
+
 
 
         //return "home";
@@ -117,6 +132,14 @@ public class MessageController {
         }
         return "redirect:/login";
     }
+
+    @GetMapping(value = {"/delete/{ID}"})
+    public String delete(@PathVariable Long ID) {
+        messageService.delete(ID);
+        return "redirect:/messages";
+    }
+
+
 
 
 }

@@ -9,9 +9,30 @@
 
 <body>
 
+<nav class="navbar navbar-expand-lg navbar-light bg-info">
+    <a class="navbar-brand text-white" href="/home">Home</a>
+    <div class="collapse navbar-collapse" id="Menu">
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link text-white" href="/messages">Messages</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white" href="/showcreate">Create Message</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/statistics">User statistics</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+
 <div class="container">
 
+    <div class="card bg-light mb-3 mx-auto" style="max-width: 80%;">
+
     <form data-th-action="@{/createmessage}" method="POST" data-th-object="${message}">
+
 
         <div class="form-group">
             <label for="text">Üzenet szövege</label>
@@ -20,6 +41,7 @@
         </div>
         <button type="submit" class="btn btn-primary">Beküld</button>
     </form>
+    </div>
 </div>
 </body>
 </html>

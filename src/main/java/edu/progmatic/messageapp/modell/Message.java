@@ -2,21 +2,30 @@ package edu.progmatic.messageapp.modell;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.persistence.*;
 import javax.validation.constraints.*;
 import java.time.LocalDateTime;
 
+@Entity
+@Table(name = "MESSAGE")
 public class Message {
 
     private static Long maxId = 0L;
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     //@NotEmpty
     //@NotNull
+    @Column(name = "author")
     private String author;
     @NotEmpty
     @NotNull
     @NotBlank
+
+    @Column(name = "text")
     private String text;
+    private boolean isDeleted;
 
     //@DateTimeFormat(pattern = "yyyy/MMMM/dd HH:mm")
     private LocalDateTime creationDate;
@@ -25,10 +34,19 @@ public class Message {
     }
 
     public Message(String author, String text, LocalDateTime creationDate) {
-        this.id = maxId++;
+        //this.id = maxId++;
         this.author = author;
         this.text = text;
         this.creationDate = creationDate;
+        this.isDeleted = false;
+    }
+
+    public boolean isDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        isDeleted = deleted;
     }
 
     public Long getId() {
