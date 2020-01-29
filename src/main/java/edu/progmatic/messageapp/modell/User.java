@@ -5,6 +5,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
@@ -14,7 +15,14 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
+@Entity
 public class User implements UserDetails {
+
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     @NotBlank
     private String username;
     @NotBlank
@@ -23,7 +31,8 @@ public class User implements UserDetails {
     private String email;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate birthDate;
-    private Set<GrantedAuthority> authorities = new HashSet<>();
+    @ManyToMany(fetch = FetchType.EAGER)
+    private Set<Authority> authorities = new HashSet<>();
 
     public User(String username, String password, String email, LocalDate birthDate){
         this.username = username;
@@ -35,7 +44,7 @@ public class User implements UserDetails {
     public User() {
     }
 
-    public void setAuthorities(Set<GrantedAuthority> authorities) {
+    public void setAuthorities(Set<Authority> authorities) {
         this.authorities = authorities;
     }
 
@@ -97,6 +106,6 @@ public class User implements UserDetails {
     }
 
     public void addAuthority(String auth){
-        authorities.add(new SimpleGrantedAuthority(auth));
+        authorities.add(new Authority(auth));
     }
 }

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <link href="/webjars/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet">
+    <script src="/webjars/jquery/3.0.0/jquery.min.js"></script>
+    <script src="/webjars/popper.js/1.14.3/popper.min.js"></script>
+    <script src="/webjars/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+</head>
+<body>
+
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <td>ID</td>
+        <td>Topic name</td>
+        <td>Option</td>
+    </tr>
+    </thead>
+    <tr data-th-each="topic: ${topicList}">
+        <td><a data-th-href="@{/topic/{id}(id=${topic.id})}" data-th-text="${topic.id}"></a></td>
+        <td data-th-text="${topic.topicName}"></td>
+
+        <td data-sec-authorize="hasRole('ADMIN')">
+            <a data-th-href="@{/deleteTopic/{ID}(ID=${topic.id})}" role="button" class="btn btn-outline-danger btn-sm">Delete</a>
+        </td>
+
+
+    </tr>
+</table>
+</body>
+</html>

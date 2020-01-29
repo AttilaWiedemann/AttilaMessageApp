@@ -38,31 +38,31 @@
     <div class="card bg-light mb-3 mx-auto" style="max-width: 80%;">
 
         <div class="card-header alert-dark" id="headingOne">
-            <h3>Új üzenet</h3>
+            <h3>Comment on message</h3>
         </div>
         <div class="card-body">
 
-        <form data-th-action="@{/createmessage}" method="POST" data-th-object="${message}">
 
 
-        <div class="form-group">
-                <textarea data-th-field="*{text}" type="text" class="form-control" rows="10" data-th-classappend="${#fields.hasErrors('text')} ? is-invalid : ''" required></textarea>
-            <div class="invalid-feedback" data-th-if="${#fields.hasErrors('text')}" data-th-errors="*{text}">Text error</div>
+
+            <div class="card bg-alert-dark mb-3" data-th-object="${parent}" style="max-width: 100%;" >
+                <div class="card-header" data-th-text="${parent.getAuthor()}">Header</div>
+                <div class="card-body">
+                    <p class="card-text" data-th-text="${parent.getText()}">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                </div>
+            </div>
+
+
+            <form data-th-action="@{/comment/{ID}(ID=${parent.id})}" method="POST" data-th-object="${message}" >
+
+                <div class="form-group">
+                    <textarea data-th-field="*{text}" type="text" class="form-control" rows="10" required></textarea>
+                </div>
+
+
+                <button type="submit" class="btn btn-primary">Beküld</button>
+            </form>
         </div>
-
-
-
-            <select data-th-field="*{myTopic.topicName}">
-                <option data-th-each="topic : ${topicList}"
-                        data-th-value="${topic.topicName}"
-                        data-th-text="${topic.topicName}">Wireframe</option>
-            </select>
-
-
-
-        <button type="submit" class="btn btn-primary">Beküld</button>
-    </form>
-    </div>
     </div>
 </div>
 </body>

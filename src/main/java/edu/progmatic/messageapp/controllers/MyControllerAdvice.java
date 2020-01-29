@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class MyControllerAdvice {
 
+    /*
     @ExceptionHandler(Exception.class)
     public String handleErrors(Model model, Exception ex){
         String trace = "";
@@ -17,5 +18,5 @@ public class MyControllerAdvice {
         model.addAttribute("exceptionMessage", trace);
         return "myError";
     }
-
+*/
 }

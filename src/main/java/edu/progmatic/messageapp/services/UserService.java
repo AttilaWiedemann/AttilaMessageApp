@@ -1,30 +1,62 @@
-/*package edu.progmatic.messageapp.services;
+package edu.progmatic.messageapp.services;
 
 import edu.progmatic.messageapp.modell.User;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.PersistenceContext;
+import javax.transaction.Transactional;
+import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
 
+//Az adatbázisból keresse ki a loaduserbyusername a felhasználót
 @Service
 public class UserService implements UserDetailsService {
 
-    Map<String, User> users = new HashMap<>();
+    @PersistenceContext
+    EntityManager em;
 
+    /*
     public UserService(){
         createUser(new User());
-    }
+    }*/
 
     @Override
-    public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
-        return null;
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        try {
+            User user = em.createQuery("select u from User u where u.username=:username", User.class).setParameter("username", username).getSingleResult();
+            return user;
+        } catch (NoResultException e) {
+            //logger.debug("User was not found: {}", username);
+            throw new UsernameNotFoundException("User was not found: " + username);
+        }
     }
 
-    public void createUser(User user){
-        users.put(user.getUsername(), user);
+    public boolean userExists(String user) {
+        try {
+            em.createQuery("select u from User u where u=:user", User.class).setParameter("user", user).getSingleResult();
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+
+    @Autowired
+    public UserService(PasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
+    }
+    private PasswordEncoder passwordEncoder;
+    @Transactional
+    public void createUser(User user) {
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        em.persist(user);
     }
 }
-
- */

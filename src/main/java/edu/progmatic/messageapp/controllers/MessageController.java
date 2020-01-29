@@ -1,8 +1,12 @@
 package edu.progmatic.messageapp.controllers;
 
+import edu.progmatic.messageapp.modell.Authority;
 import edu.progmatic.messageapp.modell.Message;
+import edu.progmatic.messageapp.modell.Topic;
 import edu.progmatic.messageapp.modell.User;
 import edu.progmatic.messageapp.services.MessageService;
+import edu.progmatic.messageapp.services.TopicService;
+import edu.progmatic.messageapp.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -15,25 +19,28 @@ import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Controller
 public class MessageController {
 
+    @PersistenceContext
+    EntityManager em;
+
     private MessageService messageService;
-    private InMemoryUserDetailsManager userService; //ennek a helyére lesz a saját
+    private UserService userService; //ennek a helyére lesz a saját
 
     @Autowired
-    public MessageController(UserDetailsService userService, MessageService messageService){   //Qualifier
-        this.userService = (InMemoryUserDetailsManager) userService;
+    public MessageController(UserService userService, MessageService messageService){   //Qualifier
+        this.userService = userService;
         this.messageService = messageService;
     }
 
@@ -49,8 +56,9 @@ public class MessageController {
             @RequestParam(name = "orderby", defaultValue = "", required = false) String orderBy,
             @RequestParam(name = "order", defaultValue = "asc", required = false) String order,
             @RequestParam(name = "deleted", required = false) String deleted,
+            @RequestParam(name = "topic", required = false) String topic,
             Model model){
-        List<Message> msgs = messageService.filterMessages(id, author, text, from, to, limit, orderBy, order, deleted);
+        List<Message> msgs = messageService.filterMessages(id, author, text, from, to, limit, orderBy, order, deleted, topic);
         //Messagek filterezése. Adminként a törölt üzenetek is
         // látszódniak, sima felhasználóként pedig csak a filterezett messagek
         if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().toString().equals("[ROLE_ADMIN]")){
@@ -61,9 +69,16 @@ public class MessageController {
         }
 
 
+/*
+        List<Topic> topics = messageService.getTopics();
+        ArrayList<String> elements = topics;
+ */
+
+
 
         return "messageList";
     }
+
 
     @GetMapping(value = "/")
     public String showPage(){
@@ -81,10 +96,40 @@ public class MessageController {
         return "oneMessage";
     }
 
+
+    //TODO---------------------------------------------------------------------------
+    @GetMapping("/message/{id}/comment")
+    public String showCommentCreator(@PathVariable("id") Long msgId, Model model){
+        Message parentMessage = messageService.getMessage(msgId);
+        Message comment = new Message();
+        comment.setParent(parentMessage);
+        model.addAttribute("parent", parentMessage);
+        model.addAttribute("message", comment);
+        return "createComment";
+    }
+
+/*
+    @PostMapping("/createcomment")
+    public String postingComment(@ModelAttribute("parent") Message parent,
+                                 @ModelAttribute("message") Message comment){
+        comment.setParent(parent);
+        comment.setMyTopic(parent.getMyTopic());
+        messageService.createMessage(comment);
+        return "messageList";
+    }*/
+
+    @PostMapping(path = "/comment/{id}")
+    public String postComment(@PathVariable("id") Long msgId, @ModelAttribute("message") Message comment, Model model){
+        messageService.createComment(msgId, comment);
+        return "home";
+    }
+
     @GetMapping(path = "/showcreate")
     public String showCreateMessage(Model model) {
         Message m = new Message();
         model.addAttribute("message", m);
+        List<Topic> topics = messageService.getTopics();
+        model.addAttribute("topicList", topics);
         return "createMessage";
     }
 
@@ -95,12 +140,13 @@ public class MessageController {
 
     @PostMapping(path = "/createmessage")
     public String createMessage(@Valid @ModelAttribute("message") Message m, BindingResult bindingResult) {
-        messageService.createMessage(m);
+
+
         if (bindingResult.hasErrors()) {
           return "createMessage";
         }
 
-
+        messageService.createMessage(m);
 
 
 
@@ -123,11 +169,14 @@ public class MessageController {
         if(bindingResult.hasErrors()){
             return "/registration";
         }
-        if(userService.userExists(user.getUsername())) {
+        /*if(userService.userExists(user.getUsername())) {
             bindingResult.rejectValue("username", "registration.username", "Existing username");
             return "/registration";
-        }else{
-            user.addAuthority("ROLE_USER");
+        }*/else{
+            Set<Authority> authoritiesSet = new HashSet<>();
+
+            authoritiesSet.add((Authority) em.createQuery("select a from Authority a where a.authority like 'ROLE_USER'").getSingleResult());
+            user.setAuthorities(authoritiesSet);
             userService.createUser(user);
         }
         return "redirect:/login";
@@ -139,7 +188,24 @@ public class MessageController {
         return "redirect:/messages";
     }
 
+/*
+    @RequestMapping(method = RequestMethod.DELETE, path = "/delete/{ID}")
+    public @ResponseBody Boolean deleteJson(@PathVariable Long ID){
+        return messageService.delete(ID);
+    }
+ */
 
+    @GetMapping(path = "/modifymessage")
+    public String modifyMessage(@RequestParam(name = "id", required = false) Long id,
+                                @RequestParam(name = "text", required = false) String text){
+        messageService.modifyMessage(id, text);
+        return "redirect:/messages";
+    }
 
+    /*
+    @RequestMapping(value = "/messages", method = RequestMethod.GET)
+    public @ResponseBody List<Message> getMessages(){
+        return messageService.getAllMessages();
+    }*/
 
 }

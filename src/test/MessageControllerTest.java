@@ -1,6 +1,8 @@
 import edu.progmatic.messageapp.controllers.MessageController;
 import edu.progmatic.messageapp.modell.Message;
 import edu.progmatic.messageapp.services.MessageService;
+import edu.progmatic.messageapp.services.TopicService;
+import edu.progmatic.messageapp.services.UserService;
 import org.mockito.InjectMocks;
 import org.mockito.Mockito;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -21,7 +23,7 @@ import static org.junit.Assert.*;
 
 public class MessageControllerTest {
 
-    InMemoryUserDetailsManager uds = Mockito.mock(InMemoryUserDetailsManager.class);
+    UserService uds = Mockito.mock(UserService.class);
     MessageService ms = Mockito.mock(MessageService.class);
     @InjectMocks
     MessageController mc = new MessageController(uds, ms);

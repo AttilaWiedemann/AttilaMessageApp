@@ -5,13 +5,13 @@ import org.springframework.format.annotation.DateTimeFormat;
 import javax.persistence.*;
 import javax.validation.constraints.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "MESSAGE")
 public class Message {
 
     private static Long maxId = 0L;
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -22,13 +22,21 @@ public class Message {
     @NotEmpty
     @NotNull
     @NotBlank
-
     @Column(name = "text")
     private String text;
     private boolean isDeleted;
 
     //@DateTimeFormat(pattern = "yyyy/MMMM/dd HH:mm")
     private LocalDateTime creationDate;
+
+    @ManyToOne
+    private Topic myTopic;
+
+    @ManyToOne
+    private Message parent;
+
+    @OneToMany(mappedBy = "parent")
+    private List<Message> children;
 
     public Message() {
     }
@@ -79,5 +87,37 @@ public class Message {
 
     public void setCreationDate(LocalDateTime creationDate) {
         this.creationDate = creationDate;
+    }
+
+    public Topic getMyTopic() {
+        return myTopic;
+    }
+
+    public void setMyTopic(Topic myTopic) {
+        this.myTopic = myTopic;
+    }
+
+    public static Long getMaxId() {
+        return maxId;
+    }
+
+    public static void setMaxId(Long maxId) {
+        Message.maxId = maxId;
+    }
+
+    public Message getParent() {
+        return parent;
+    }
+
+    public void setParent(Message parent) {
+        this.parent = parent;
+    }
+
+    public List<Message> getChildren() {
+        return children;
+    }
+
+    public void setChildren(List<Message> children) {
+        this.children = children;
     }
 }
