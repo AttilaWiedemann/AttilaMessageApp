@@ -34,6 +34,8 @@ public class User implements UserDetails {
     @ManyToMany(fetch = FetchType.EAGER)
     private Set<Authority> authorities = new HashSet<>();
 
+    private String CurrentChatPartner;
+
     public User(String username, String password, String email, LocalDate birthDate){
         this.username = username;
         this.password = password;
@@ -50,6 +52,14 @@ public class User implements UserDetails {
 
     public String getUsername() {
         return username;
+    }
+
+    public String getCurrentChatPartner() {
+        return CurrentChatPartner;
+    }
+
+    public void setCurrentChatPartner(String currentChatPartner) {
+        CurrentChatPartner = currentChatPartner;
     }
 
     @Override

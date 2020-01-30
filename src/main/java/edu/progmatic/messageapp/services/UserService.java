@@ -13,8 +13,12 @@ import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 //Az adatbázisból keresse ki a loaduserbyusername a felhasználót
 @Service
@@ -46,6 +50,12 @@ public class UserService implements UserDetailsService {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    public List<String> getUsernames(){
+        List<User> userlist = em.createQuery("select u from User u").getResultList();
+        Stream<String> userNames = userlist.stream().map(user -> user.getUsername());
+        return userNames.collect(Collectors.toList());
     }
 
 

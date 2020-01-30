@@ -64,7 +64,7 @@ public class WebSecConfig extends WebSecurityConfigurerAdapter {
                 .logoutSuccessUrl("/home")
                 .and()
                 .authorizeRequests()
-                .antMatchers("/login", "topicCreator", "/images/*"," /home", "/registration", "/messages", "/webjars/bootstrap/**", "/webjars/jquery/**", "/webjars/popper.js/**").permitAll()
+                .antMatchers("/login", "topicCreator", "/images/*","/js/*", "/home", "/registration", "/messages", "/webjars/bootstrap/**", "/webjars/jquery/**", "/webjars/popper.js/**").permitAll()
                         .antMatchers("/statistics").hasRole("ADMIN")
                 .anyRequest().authenticated();
     }
