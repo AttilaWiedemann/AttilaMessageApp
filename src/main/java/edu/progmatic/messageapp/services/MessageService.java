@@ -159,6 +159,10 @@ public class MessageService {
         messages.add(m);
     }*/
 
+    public String getCurrentUser(){
+        return SecurityContextHolder.getContext().getAuthentication().getName();
+    }
+
     @Transactional
     public void createMessage(Message m) {
         String loggedInUserName = SecurityContextHolder.getContext().getAuthentication().getName();

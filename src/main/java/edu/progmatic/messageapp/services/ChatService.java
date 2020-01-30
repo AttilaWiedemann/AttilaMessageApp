@@ -16,13 +16,12 @@ public class ChatService {
     @PersistenceContext
     EntityManager em;
 
+
+
     //TODO create chatMessage metódus
 
     @Transactional
     public void createChatMessage(ChatMessage chatMessage){
-        String loggedInUserName = SecurityContextHolder.getContext().getAuthentication().getName();
-        chatMessage.setSender(loggedInUserName);
-        chatMessage.setTimeSent(LocalDateTime.now());
         em.persist(chatMessage);
     }
 

@@ -1,47 +1,30 @@
 package edu.progmatic.messageapp.modell;
 
-import javax.persistence.*;
-import java.time.LocalDateTime;
-
-@Entity
-@Table(name = "ChatMessage")
 public class ChatMessage {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private String text;
-    private LocalDateTime timeSent;
+    private MessageType type;
+    private String content;
     private String sender;
-    private String reciever;
 
-    public ChatMessage(){}
-
-    public ChatMessage(String text){
-        this.text = text;
+    public enum MessageType {
+        CHAT,
+        JOIN,
+        LEAVE
     }
 
-    public Long getId() {
-        return id;
+    public MessageType getType() {
+        return type;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setType(MessageType type) {
+        this.type = type;
     }
 
-    public String getText() {
-        return text;
+    public String getContent() {
+        return content;
     }
 
-    public void setText(String text) {
-        this.text = text;
-    }
-
-    public LocalDateTime getTimeSent() {
-        return timeSent;
-    }
-
-    public void setTimeSent(LocalDateTime timeSent) {
-        this.timeSent = timeSent;
+    public void setContent(String content) {
+        this.content = content;
     }
 
     public String getSender() {
@@ -50,13 +33,5 @@ public class ChatMessage {
 
     public void setSender(String sender) {
         this.sender = sender;
-    }
-
-    public String getReciever() {
-        return reciever;
-    }
-
-    public void setReciever(String reciever) {
-        this.reciever = reciever;
     }
 }
